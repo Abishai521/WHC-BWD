@@ -17,7 +17,12 @@ st.write("""
 # ENSURE YOU HAVE FILLED OUT ALL INPUTS TO REMOVE ERROR BOX!!!
 """)
 
-
+benchmark = 'SPY'
+benchmarkData = yf.Ticker(benchmark)
+benchmarkHistory = benchmarkData.history()
+benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
+benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
+benchmarkRet = benchmarkData.Close.pct_change()[1:]
 startDate = datetime.today().strftime('%Y-%m-%d')
 benchmark = st.sidebar.text_input("Select the benchmark ticker for your portfolio:")
 
@@ -29,7 +34,11 @@ startDay = st.sidebar.text_input("Type day in 'DD' format")
 startDate = (startYear + "-" + startMonth + "-" + startDay)
 endDate = datetime.today().strftime('%Y-%m-%d')
 
-
+benchmarkData = yf.Ticker(benchmark)
+benchmarkHistory = benchmarkData.history()
+benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
+benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
+benchmarkRet = benchmarkData.Close.pct_change()[1:]
 
 list = []
 shareCount = []
@@ -44,12 +53,6 @@ while (i < (int(numberStocks)) + 1):
     list += [currentTickerSlot]
     shareCount += [numberShares]
     i += 1
-
-benchmarkData = yf.Ticker(benchmark)
-benchmarkHistory = benchmarkData.history()
-benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
-benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
-benchmarkRet = benchmarkData.Close.pct_change()[1:]
 
 def linreg(x, y):
     x = sm.add_constant(x)
