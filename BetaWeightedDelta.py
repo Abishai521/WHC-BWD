@@ -18,7 +18,7 @@ st.write("""
 """)
 
 
-
+startDate = datetime.today().strftime('%Y-%m-%d')
 benchmark = st.sidebar.text_input("Select the benchmark ticker for your portfolio:")
 
 numberStocks = st.sidebar.slider('Select the number of tickers in your portfolio')
