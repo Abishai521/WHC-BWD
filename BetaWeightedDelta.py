@@ -62,7 +62,15 @@ while (i < (int(numberStocks)) + 1):
     shareCount += [numberShares]
     i += 1
 
-
+st.write("""
+# The portfolio breakdown:
+""")
+labels = list
+sizes = shareCount
+fig1, ax1 = plt.subplots()
+ax1.pie(sizes, explode = explode, labels = labels, autopct='%1.1f%%', shadow = True, startangle = 90)
+ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+st.pyplot(fig1)
 
 def linreg(x, y):
     x = sm.add_constant(x)
@@ -106,13 +114,9 @@ st.write("""
 # The total portfolio beta-weighted delta is:
 """, portfolioBWD)
 
-labels = list
-sizes = shareCount
-fig1, ax1 = plt.subplots()
-ax1.pie(sizes, explode = explode, labels = labels, autopct='%1.1f%%', shadow = True, startangle = 90)
-ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-st.pyplot(fig1)
-
+st.write("""
+# The portfolio beta-weighted delta break down:
+""")
 labels = list
 sizes = betaWeights
 fig2, ax2 = plt.subplots()
