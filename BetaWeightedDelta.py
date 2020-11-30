@@ -45,8 +45,8 @@ benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
 benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
 benchmarkRet = benchmarkData.Close.pct_change()[1:]
 
-betaWeights[]
-explode =[]
+betaWeights = []
+explode = []
 list = []
 shareCount = []
 portfolioBWD = 0
