@@ -33,6 +33,7 @@ startDay = st.sidebar.text_input("Type day in 'DD' format")
 startDate = (startYear + "-" + startMonth + "-" + startDay)
 endDate = datetime.today().strftime('%Y-%m-%d')
 
+benchmarkData = yf.Ticker(benchmark)
 benchmarkHistory = benchmarkData.history()
 benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
 benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
