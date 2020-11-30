@@ -1,1 +1,1 @@
-web: streamlit run --server.enableCORS false --server.port $PORT BetaWeightedDelta.py
+web: sh setup.sh && streamlit run BetaWeightedDelta.py
