@@ -44,6 +44,7 @@ benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
 benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
 benchmarkRet = benchmarkData.Close.pct_change()[1:]
 
+betaWeights[]
 explode =[]
 list = []
 shareCount = []
@@ -98,6 +99,7 @@ for stock in list:
     st.write("Risk factor(beta) of " + stock + " is: ", beta)
     # st.write("Delta of " + stock + " is: ", delta)
     st.write("The Beta Weighted Delta of " + stock + " is: ", bwd)
+    betaWeights += [bwd]
 
 st.write("""
 # The total portfolio beta-weighted delta is:
@@ -109,3 +111,10 @@ fig1, ax1 = plt.subplots()
 ax1.pie(sizes, explode = explode, labels = labels, autopct='%1.1f%%', shadow = True, startangle = 90)
 ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 st.pyplot(fig1)
+
+labels = list
+sizes = betaWeights
+fig2, ax2 = plt.subplots()
+ax2.pie(sizes, explode = explode, labels = labels, autopct='%1.1f%%', shadow = True, startangle = 90)
+ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+st.pyplot(fig2)
