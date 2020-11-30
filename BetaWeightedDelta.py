@@ -7,6 +7,7 @@ from alpha_vantage.timeseries import TimeSeries
 from pandas_datareader import data as pdr
 from statsmodels import regression
 
+st.set_option('deprecation.showPyplotGlobalUse', False)
 ts = TimeSeries(key='JM4MU7FUTY9MN6VK', output_format='pandas')
 #client_id = 'NCRJQTMSAW3PLXYMZXOTA6DAL2LUZLRW'
 
