@@ -2,6 +2,7 @@ from datetime import datetime
 import statsmodels.api as sm
 import streamlit as st
 import yfinance as yf
+import matplotlib.pyplot as plt
 from alpha_vantage.timeseries import TimeSeries
 from pandas_datareader import data as pdr
 from statsmodels import regression
@@ -39,7 +40,7 @@ benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
 benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
 benchmarkRet = benchmarkData.Close.pct_change()[1:]
 
-
+explode =[]
 list = []
 shareCount = []
 portfolioBWD = 0
@@ -51,6 +52,7 @@ while (i < (int(numberStocks)) + 1):
     currentTickerName = "Number of shares of " + currentTickerSlot
     numberShares = st.sidebar.number_input(currentTickerName, 1, 100)
     list += [currentTickerSlot]
+    explode += [0]
     shareCount += [numberShares]
     i += 1
 
@@ -94,5 +96,12 @@ for stock in list:
     st.write("The Beta Weighted Delta of " + stock + " is: ", bwd)
 
 st.write("""
-# The total portfolio weighted delta is:
+# The total portfolio beta-weighted delta is:
 """, portfolioBWD)
+
+labels = list
+sizes = shareCount
+fig1, ax1 = plt.subplots()
+ax1.pie(sizes, explode = [0], labels = labels, autopct='%1.1f%%', shadow = True, startangle = 90)
+ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+st.pyplot()
