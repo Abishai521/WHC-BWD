@@ -27,7 +27,7 @@ benchmark = 'SPY'
 benchmarkData = yf.Ticker(benchmark)
 benchmarkHistory = benchmarkData.history()
 benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
-benchmarkData = pdr.get_data_yahoo(benchmark, start = startDate, end = endDate)
+benchmarkData = pdr.get_data_yahoo(benchmark, start = '2019-11-29', end = '2019-11-29')
 benchmarkRet = benchmarkData.Close.pct_change()[1:]
 benchmark = st.sidebar.text_input("Select the benchmark ticker for your portfolio:")
 
