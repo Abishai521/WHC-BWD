@@ -7,14 +7,7 @@ from yahoo_fin import options
 from wallstreet import Stock, Call, Put
 from alpha_vantage.timeseries import TimeSeries
 from pandas_datareader import data as pdr
-from statsmodels import regression
-from datetime import datetime
-import statsmodels.api as sm
-import streamlit as st
-import yfinance as yf
-import matplotlib.pyplot as plt
-from alpha_vantage.timeseries import TimeSeries
-from pandas_datareader import data as pdr
+import pandas as pd
 from statsmodels import regression
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -49,13 +42,12 @@ startDay = st.sidebar.text_input("Type day in 'DD' format")
 startDate = (startYear + "-" + startMonth + "-" + startDay)
 endDate = datetime.today().strftime('%Y-%m-%d')
 
-st.sidebar.write('''
-# Choose a Hedging Start Date:
-''')
-startYear = st.sidebar.text_input("Type year in 'YYYY' format")
-startMonth = st.sidebar.text_input("Type month in 'MM' format")
-startDay = st.sidebar.text_input("Type day in 'DD' format")
-startDate = (startYear + "-" + startMonth + "-" + startDay)
+st.write("Select the hedge date.")
+hedgeYear = st.sidebar.text_input("Type hedge year in 'YYYY' format")
+hedgeMonth = st.sidebar.text_input("Type hedge month in 'MM' format")
+hedgeDay = st.sidebar.text_input("Type hedge day in 'DD' format")
+hedgeDate = (hedgeYear + "-" + hedgeMonth + "-" + hedgeDay)
+
 
 benchmarkData = yf.Ticker(benchmark)
 benchmarkHistory = benchmarkData.history()
@@ -68,6 +60,7 @@ explode = []
 list = []
 shareCount = []
 expiryDates = []
+userSelectedHedgeDates = {}
 portfolioBWD = 0
 i = 1
 while (i < (int(numberStocks)) + 1):
@@ -80,6 +73,7 @@ while (i < (int(numberStocks)) + 1):
     explode += [0]
     shareCount += [numberShares]
     i += 1
+
 
 st.write("""
 # The portfolio breakdown:
@@ -143,7 +137,24 @@ ax2.pie(sizes, explode = explode, labels = labels, autopct='%1.1f%%', shadow = T
 ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 st.pyplot(fig2)
 
+
 # Predicting Sells/Buys
+
+def find_closed_exp_dates(input_exp_day, input_exp_month, input_exp_year, expiration_dates_list, top_closest=10):
+  df = pd.DataFrame(columns = ['potential_times', 'time_difference'])
+  df['potential_times'] = expiration_dates_list
+
+  input_date = datetime(input_exp_year, input_exp_month, input_exp_day)
+
+  for index in range(len(df)):
+    p_time = df['potential_times'][index]
+    potential_exp = datetime.strptime(p_time, "%B %d, %Y")
+    difference = abs((potential_exp - input_date).total_seconds()/60)
+    df['time_difference'][index] = difference
+
+  sorted_df = df.sort_values(by='time_difference')
+  top_closest_dates = sorted_df['potential_times'][:top_closest].values
+  return top_closest_dates
 
 # 1: Target Delta
 targetDelta = st.number_input("What is your target portfolio delta?", 1)
@@ -158,16 +169,20 @@ if(reqDelta > 0):
 # 3: Expiry dates
     # options import to find all expiry dates
 benchMarkExpDate = options.get_expiration_dates(benchmark)
-for(expStock in list):
-    expiryDates[expStock] = options.get_expiration_dates(expStock)
-    
-# 4: Hedging Instruments
-    
+#stockExpirationDict = {}
+st.write("Select hedge dates: ")
+for stock in list:
+    expDates = options.get_expiration_dates(stock)
+    bestExpDates = find_closed_exp_dates(int(hedgeDay), int(hedgeMonth), int(hedgeYear), expDates, 3)
+    currentStr = "Select hedge date for " + stock + " : "
+    userSelectedHedgeDates[stock] = st.radio(currentStr, bestExpDates)
 
-# 5: correct option type
 
-# 6: corres. delta, strike prices
 
-# 7: strike prices for delta range
+# 4: correct option type
 
-# 8: calls/puts details
+# 5: corres. delta, strike prices
+
+# 6: strike prices for delta range
+
+# 7: calls/puts details
