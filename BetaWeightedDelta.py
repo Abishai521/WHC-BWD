@@ -3,6 +3,16 @@ import statsmodels.api as sm
 import streamlit as st
 import yfinance as yf
 import matplotlib.pyplot as plt
+from yahoo_fin import options
+from wallstreet import Stock, Call, Put
+from alpha_vantage.timeseries import TimeSeries
+from pandas_datareader import data as pdr
+from statsmodels import regression
+from datetime import datetime
+import statsmodels.api as sm
+import streamlit as st
+import yfinance as yf
+import matplotlib.pyplot as plt
 from alpha_vantage.timeseries import TimeSeries
 from pandas_datareader import data as pdr
 from statsmodels import regression
@@ -123,3 +133,29 @@ fig2, ax2 = plt.subplots()
 ax2.pie(sizes, explode = explode, labels = labels, autopct='%1.1f%%', shadow = True, startangle = 90)
 ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 st.pyplot(fig2)
+
+# Predicting Sells/Buys
+
+# 1: Target Delta
+targetDelta = st.number_input("What is your target portfolio delta?", 1)
+
+# 2: Reduce/Increase/Neutralize exposure
+reqDelta = (targetDelta * 100) - portfolioBWD
+exposString = "No action required"
+if(reqDelta < 0):
+    exposString = "Reduce Exposure; Buy Puts of delta:" + str(reqDelta)
+if(reqDelta > 0):
+    exposString = "Add Exposure; Buy Calls of delta:" + str(reqDelta)
+# 3: Expiry dates
+    # options import to find all expiry dates
+
+# 4: Hedging Instruments
+
+
+# 5: correct option type
+
+# 6: corres. delta, strike prices
+
+# 7: strike prices for delta range
+
+# 8: calls/puts details
