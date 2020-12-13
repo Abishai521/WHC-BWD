@@ -49,6 +49,14 @@ startDay = st.sidebar.text_input("Type day in 'DD' format")
 startDate = (startYear + "-" + startMonth + "-" + startDay)
 endDate = datetime.today().strftime('%Y-%m-%d')
 
+st.sidebar.write('''
+# Choose a Hedging Start Date:
+''')
+startYear = st.sidebar.text_input("Type year in 'YYYY' format")
+startMonth = st.sidebar.text_input("Type month in 'MM' format")
+startDay = st.sidebar.text_input("Type day in 'DD' format")
+startDate = (startYear + "-" + startMonth + "-" + startDay)
+
 benchmarkData = yf.Ticker(benchmark)
 benchmarkHistory = benchmarkData.history()
 benchmarkPrice = (benchmarkHistory.tail(1)['Close'].iloc[0])
@@ -59,6 +67,7 @@ betaWeights = []
 explode = []
 list = []
 shareCount = []
+expiryDates = []
 portfolioBWD = 0
 i = 1
 while (i < (int(numberStocks)) + 1):
@@ -148,9 +157,12 @@ if(reqDelta > 0):
     exposString = "Add Exposure; Buy Calls of delta:" + str(reqDelta)
 # 3: Expiry dates
     # options import to find all expiry dates
-
+benchMarkExpDate = options.get_expiration_dates(benchmark)
+for(expStock in list):
+    expiryDates[expStock] = options.get_expiration_dates(expStock)
+    
 # 4: Hedging Instruments
-
+    
 
 # 5: correct option type
 
