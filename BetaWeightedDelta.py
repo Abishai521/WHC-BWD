@@ -191,22 +191,15 @@ for stock in list:
 
 # 5: corresponding delta, strike prices
 options_chain= options.get_options_chain(benchmark, actualHedgeDate)
-st.write("check1a")
 options_chain= options_chain[optionType]
-st.write("check1b")
 options_delta = pd.DataFrame()
-st.write("check1c")
 options_delta['Strike'] = options_chain['Strike']
-st.write("check1d")
 options_delta['Delta'] = np.NaN
-st.write("check1e")
 if (optionType == 'calls'):
-    st.write("check2a")
     for strike in range(0, len(options_delta)):
         d1 = Call(benchmark, d=int(hedgeDay), m=int(hedgeMonth), y=int(hedgeYear), strike=options_delta['Strike'][strike])
         options_delta.iloc[strike, 1] = d1.delta()
 else:
-    st.write("check2b")
     for strike in range(0, len(options_delta)):
         d1 = Put(benchmark, d=int(hedgeDay), m=int(hedgeMonth), y=int(hedgeYear), strike=options_delta['Strike'][strike])
         options_delta.iloc[strike, 1] = d1.delta()
