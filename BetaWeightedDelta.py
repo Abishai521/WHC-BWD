@@ -8,6 +8,7 @@ from wallstreet import Stock, Call, Put
 from alpha_vantage.timeseries import TimeSeries
 from pandas_datareader import data as pdr
 import pandas as pd
+import numpy as np
 from statsmodels import regression
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -61,6 +62,7 @@ list = []
 shareCount = []
 expiryDates = []
 userSelectedHedgeDates = {}
+optionTypes = 0
 portfolioBWD = 0
 i = 1
 while (i < (int(numberStocks)) + 1):
@@ -166,23 +168,72 @@ if(reqDelta < 0):
     exposString = "Reduce Exposure; Buy Puts of delta:" + str(reqDelta)
 if(reqDelta > 0):
     exposString = "Add Exposure; Buy Calls of delta:" + str(reqDelta)
+
 # 3: Expiry dates
     # options import to find all expiry dates
 benchMarkExpDate = options.get_expiration_dates(benchmark)
 #stockExpirationDict = {}
 st.write("Select hedge dates: ")
-for stock in list:
-    expDates = options.get_expiration_dates(stock)
-    bestExpDates = find_closed_exp_dates(int(hedgeDay), int(hedgeMonth), int(hedgeYear), expDates, 3)
-    currentStr = "Select hedge date for " + stock + " : "
-    userSelectedHedgeDates[stock] = st.radio(currentStr, bestExpDates)
-
-
+expDates = options.get_expiration_dates(benchmark)
+#bestExpDates = find_closed_exp_dates(int(hedgeDay), int(hedgeMonth), int(hedgeYear), expDates, 3)
+currentStr = "Select hedge date: "
+#actualHedgeDate = st.radio(currentStr, bestExpDates)
+actualHedgeDate = st.radio(currentStr, expDates)
 
 # 4: correct option type
+for stock in list:
+    if (reqDelta < 0):
+        optionType = 'puts'
+    elif (reqDelta > 0):
+        optionType = 'calls'
+    else:
+        optionType = 'None'
 
-# 5: corres. delta, strike prices
+# 5: corresponding delta, strike prices
+options_chain= options.get_options_chain(benchmark, actualHedgeDate)
+st.write("check1a")
+options_chain= options_chain[optionType]
+st.write("check1b")
+options_delta = pd.DataFrame()
+st.write("check1c")
+options_delta['Strike'] = options_chain['Strike']
+st.write("check1d")
+options_delta['Delta'] = np.NaN
+st.write("check1e")
+if (optionType == 'calls'):
+    st.write("check2a")
+    for strike in range(0, len(options_delta)):
+        d1 = Call(benchmark, d=int(hedgeDay), m=int(hedgeMonth), y=int(hedgeYear), strike=options_delta['Strike'][strike])
+        options_delta.iloc[strike, 1] = d1.delta()
+else:
+    st.write("check2b")
+    for strike in range(0, len(options_delta)):
+        d1 = Put(benchmark, d=int(hedgeDay), m=int(hedgeMonth), y=int(hedgeYear), strike=options_delta['Strike'][strike])
+        options_delta.iloc[strike, 1] = d1.delta()
+st.write(options_delta)
 
 # 6: strike prices for delta range
+strike_range = 0
+if reqDelta >0:
+    strike_range = options_delta[(0.35 <= options_delta['Delta']) & (options_delta['Delta'] <= 0.65)]
+else:
+    strike_range = options_delta[(-0.65 <= options_delta['Delta']) & (options_delta['Delta'] <= -0.35)]
 
 # 7: calls/puts details
+userDeltaChoice = st.text_input("Please enter preferred delta or type \"D\" for default delta:", "D")
+if (userDeltaChoice == 'D' and optionType == 'calls'):
+    userDeltaChoice = 0.35
+elif (userDeltaChoice == 'D' and optionType == 'puts'):
+    userDeltaChoice = -0.35
+else:
+    userDeltaChoice = float(userDeltaChoice)
+
+#8: Suggestion
+difference= abs(strike_range['Delta'])- abs(userDeltaChoice)
+strike_range.loc[:,'Difference'] = difference
+min_strike_idx = strike_range['Difference'].idxmin()
+suggestStrike = strike_range.loc[min_strike_idx,'Strike']
+suggestDelta = strike_range.loc[min_strike_idx,'Delta']
+deltaQuantity = reqDelta/(suggestDelta*100)
+finalSuggestion = "You need to buy " +  str(deltaQuantity) + " " + optionType + " of strike " + str(suggestStrike)
+st.write(finalSuggestion)
